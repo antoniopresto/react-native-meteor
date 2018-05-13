@@ -38,13 +38,16 @@ export default {
         // See https://github.com/facebook/react/issues/3398.
         this.props = nextProps;
         this.state = nextState;
-        newData = this._meteorDataManager.calculateData();
+        if (this._meteorDataManager) {
+          newData = this._meteorDataManager.calculateData();
+        }
       } finally {
         this.props = saveProps;
         this.state = saveState;
       }
-
-      this._meteorDataManager.updateData(newData);
+      if (this._meteorDataManager && newData) {
+        this._meteorDataManager.updateData(newData);
+      }
     }
 
   },
@@ -111,11 +114,11 @@ class MeteorDataManager {
           try {
             component.setState = () => {
               throw new Error(
-"Can't call `setState` inside `getMeteorData` as this could cause an endless" +
-" loop. To respond to Meteor data changing, consider making this component" +
-" a \"wrapper component\" that only fetches data and passes it in as props to" +
-" a child component. Then you can use `componentWillReceiveProps` in that" +
-" child component.");
+                "Can't call `setState` inside `getMeteorData` as this could cause an endless" +
+                " loop. To respond to Meteor data changing, consider making this component" +
+                " a \"wrapper component\" that only fetches data and passes it in as props to" +
+                " a child component. Then you can use `componentWillReceiveProps` in that" +
+                " child component.");
             };
 
             data = component.getMeteorData();
@@ -175,4 +178,3 @@ class MeteorDataManager {
     this.oldData = newData;
   }
 }
-
